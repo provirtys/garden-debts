@@ -1,0 +1,73 @@
+@import "./imports";
+
+.container {
+	max-width: 1500px;
+	margin: 0 auto;
+}
+
+.table th,
+.table td {
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
+}
+
+tr {
+	height: 45px;
+}
+
+tr th:not(:first-child):not(:last-child),
+tr td:not(:first-child):not(:last-child):not(:nth-child(2)) {
+	width: 100px;
+}
+
+tr td:not(:first-child):not(:last-child):not(:nth-child(2)) {
+	padding: 0;
+}
+
+tr td:first-child {
+	text-align: center;
+	width: 30px;
+}
+
+tr td:last-child {
+	text-align: center;
+}
+
+.table label {
+	box-sizing: border-box;
+	display: flex;
+	height: 45px;
+	padding: 8px;
+	cursor: pointer;
+
+	& input[type="checkbox"] {
+		cursor: pointer;
+	}
+}
+
+.td-checkbox {
+	transition: background-color .3s;
+
+	&:hover {
+		background-color: rgb(35, 187, 35, 0.2);
+	}
+
+	&.checked {
+		background-color: rgb(35, 187, 35, 0.86);
+	}
+
+	input {
+		display: none;
+	}
+}
+
+.table .table-cell-name {
+	text-align: center;
+}
+
+.person-img {
+	margin-top: 5px;
+	width: 100%;
+	height: 100%;
+}
