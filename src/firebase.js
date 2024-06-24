@@ -1,16 +1,16 @@
 import app from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
-import {getFirestore, collection, getDocs} from 'firebase/firestore'
+import { deleteDoc, doc } from 'firebase/firestore';
 
 const config = {
-  apiKey: "AIzaSyCSrFVLDEzT0PdBl7yOVQQb10z2d8DCkEY",
-  authDomain: "react-firebase-51d42.firebaseapp.com",
-  databaseURL: "https://react-firebase-51d42-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "react-firebase-51d42",
-  storageBucket: "react-firebase-51d42.appspot.com",
-  messagingSenderId: "492092165660",
-  appId: "1:492092165660:web:77234ca1b993033e5499d9"
+	apiKey: "AIzaSyCSrFVLDEzT0PdBl7yOVQQb10z2d8DCkEY",
+	authDomain: "react-firebase-51d42.firebaseapp.com",
+	databaseURL: "https://react-firebase-51d42-default-rtdb.asia-southeast1.firebasedatabase.app",
+	projectId: "react-firebase-51d42",
+	storageBucket: "react-firebase-51d42.appspot.com",
+	messagingSenderId: "492092165660",
+	appId: "1:492092165660:web:77234ca1b993033e5499d9"
 };
 
 
@@ -37,7 +37,7 @@ class Firebase {
 	}
 
 	addQuote(quote) {
-		if(!this.auth.currentUser) {
+		if (!this.auth.currentUser) {
 			return alert('Not authorized')
 		}
 
@@ -46,18 +46,20 @@ class Firebase {
 		})
 	}
 
-	addUsing(person,product){
+	async addUsing(person, product) {
 		this.db.collection('usings').add({
-			person:person,
-			product:product
+			person: person,
+			product: product
 		})
 	}
 
-	removeUsing(person,product){
-		this.db.collection('usings').add({
-			person:person,
-			product:product
-		})
+	async removeUsing(documentId) {
+		try {
+			const docRef = doc(this.db, 'usings', documentId);
+			await deleteDoc(docRef);
+		} catch (error) {
+			console.error('Error deleting document:', error);
+		}
 	}
 
 	isInitialized() {
@@ -75,19 +77,32 @@ class Firebase {
 		return quote.get('quote')
 	}
 
-	async getUsings(){
-		const usings = await this.db.doc(`usings/OWqrUsqhrKnRyjFliee5`).get()
-		// console.log(usings);
-		return usings
+	async getUsings() {
+		const usings = await this.db.collection('usings').get()
+		return usings.docs.map(doc => ({id:doc.id, ...doc.data()}))
+	}
 
-		let db2 = getFirestore()
-		const colRef = collection(db2, 'usings')
-		
-		
-		await getDocs(colRef)
-			.then(snapshot => this.docs = snapshot.docs)
+	async getPersons() {
+		const persons = await this.db.collection('persons').get()
+		return persons.docs.map(doc => ({id:doc.id, ...doc.data()}))
+	}
 
-		return this.docs
+	async getProducts() {
+		const products = await this.db.collection('products').get()
+		return products.docs.map(doc => ({id:doc.id, ...doc.data()}))
+	}
+
+	async addProduct(name, title, price) {
+		this.db.collection('products').add({
+			name,
+			title,
+			price
+		})
+	}
+
+	async editProduct(id, data) {
+		console.log(id, data);
+		this.db.collection('products').doc(id).update(data)
 	}
 }
 

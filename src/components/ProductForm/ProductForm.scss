@@ -1,0 +1,14 @@
+.product-form {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 30px;
+  min-width: 300px;
+  min-height: 200px;
+
+  .product-form__input {
+    margin-bottom: 10px;
+  }
+}
