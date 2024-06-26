@@ -40,8 +40,8 @@ export const ProductForm = ({ onSubmit, action, product }) => {
 
   return (
     <>
-    <h2>{title}</h2>
     <form className='product-form' onSubmit={handleSubmit}>
+	    <h2 className='product-form__title'>{title}</h2>
       <TextField className='product-form__input' label="Код (например: apple)" variant="outlined" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
       <TextField className='product-form__input' label="Название" variant="outlined" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
       <TextField className='product-form__input' label="Сумма (руб.)" type='number' variant="outlined" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />

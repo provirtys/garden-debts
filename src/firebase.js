@@ -93,7 +93,7 @@ class Firebase {
 	}
 
 	async addProduct(name, title, price) {
-		this.db.collection('products').add({
+		await this.db.collection('products').add({
 			name,
 			title,
 			price
@@ -101,8 +101,7 @@ class Firebase {
 	}
 
 	async editProduct(id, data) {
-		console.log(id, data);
-		this.db.collection('products').doc(id).update(data)
+		await this.db.collection('products').doc(id).update(data)
 	}
 }
 
