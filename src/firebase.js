@@ -110,10 +110,15 @@ class Firebase {
     await this.db.collection("products").doc(id).update(data)
   }
 
-  async addPerson(name, title) {
+  async deleteProduct(id) {
+    await this.db.collection("products").doc(id).delete()
+  }
+
+  async addPerson(name, title, image) {
     await this.db.collection("persons").add({
       name,
       title,
+      image
     })
   }
 
@@ -121,8 +126,8 @@ class Firebase {
     await this.db.collection("persons").doc(id).update(data)
   }
 
-  getImageStorage() {
-    return getStorage(app)
+  async deletePerson(id) {
+    await this.db.collection("persons").doc(id).delete()
   }
 }
 

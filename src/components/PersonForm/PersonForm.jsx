@@ -3,11 +3,11 @@ import React, { useEffect, useMemo, useState } from "react"
 import { TextField, Input } from "@mui/material"
 import Button from "@mui/material/Button"
 
-export const PersonForm = ({ onSubmit, action, person }) => {
+export const PersonForm = ({ action, person, onSavePerson, onDeletePerson }) => {
   const [form, setForm] = useState({
     name: "",
     title: "",
-    // image: "",
+    image: null,
   })
 
   useEffect(() => {
@@ -15,13 +15,13 @@ export const PersonForm = ({ onSubmit, action, person }) => {
       setForm({
         name: person.name ?? "",
         title: person.title,
-        // image: person.image,
+        image: person.image,
       })
     } else if (action === "add") {
       setForm({
         name: "",
         title: "",
-        // image: "",
+        image: null,
       })
     }
   }, [action, person])
@@ -31,14 +31,17 @@ export const PersonForm = ({ onSubmit, action, person }) => {
     [action]
   )
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    onSubmit(form)
+  const addPersonHandler = () => {
+    onSavePerson(form)
+  }
+
+  const deletePersonHandler = () => {
+    onDeletePerson(person)
   }
 
   return (
     <>
-      <form className="entity-form" onSubmit={handleSubmit}>
+      <form className="entity-form" onSubmit={e => e.preventDefault()}>
         <h2 className="entity-form__title">{title}</h2>
         <TextField
           className="entity-form__input"
@@ -57,18 +60,23 @@ export const PersonForm = ({ onSubmit, action, person }) => {
         <Input
           className="entity-form__input"
           type="file"
-          // onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+          onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
         />
         {action === "add" && (
-          <Button className="add-person" variant="contained" type="submit">
+          <Button className="form-button add-person" variant="contained" type="submit" onClick={addPersonHandler}>
             Добавить
           </Button>
         )}
-        {action === "edit" && (
-          <Button className="add-person" variant="contained" type="submit">
-            Сохранить
-          </Button>
-        )}
+        {action === "edit" &&
+          <>
+            <Button className="form-button add-person" variant="contained" type="submit" onClick={addPersonHandler}>
+              Сохранить
+            </Button>
+            <Button className="form-button delete-person" color="error" variant="contained" type="submit" onClick={deletePersonHandler}>
+              Удалить
+            </Button>
+          </>
+        }
       </form>
     </>
   )

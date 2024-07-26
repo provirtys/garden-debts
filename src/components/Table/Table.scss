@@ -67,8 +67,12 @@ tr td:last-child {
   }
 }
 
-.table .table-cell-name {
+.table .cell-person {
   text-align: center;
+}
+
+.cell-person__top {
+  margin-bottom: 10px;
 }
 
 .table .row-number {
@@ -76,6 +80,6 @@ tr td:last-child {
   box-sizing: border-box;
 }
 
-.person-edit{
-	margin-left: 10px;
+.person-edit {
+  margin-left: 10px;
 }

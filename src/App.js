@@ -37,7 +37,9 @@ function App() {
     usings.forEach((using) => {
       const person = updatedPersons.find((person) => person.id === using.person)
       const product = products.find((product) => product.id === using.product)
-      person.debt += product.price / +pricePerProducts[product.id].toFixed(2)
+      if (person && product) {
+        person.debt += product.price / +pricePerProducts[product.id].toFixed(2)
+      }
     })
 
     setPersons(updatedPersons)
@@ -81,7 +83,7 @@ function App() {
     setPersonModal(true)
   }
 
-  const onProductFormSubmit = async (product) => {
+  const onSaveProduct = async (product) => {
     setLoadingModal(true)
     if (productFormAction === "add") {
       await firebase.addProduct(product.name, product.title, product.price)
@@ -94,16 +96,36 @@ function App() {
     setLoadingModal(false)
   }
 
-  const onPersonFormSubmit = async (person) => {
+  const onDeleteProduct = async (product) => {
     setLoadingModal(true)
+    await firebase.deleteProduct(product.id)
+    const newProducts = await firebase.getProducts()
+    setProducts(newProducts)
+    setProductModal(false)
+    setLoadingModal(false)
+  }
+
+  const onSavePerson = async (person) => {
+    setLoadingModal(true)
+    if (person.image) {
+      person.image = await uploadImage(person.image)
+    }
     if (personFormAction === "add") {
-      console.log(person)
-      await firebase.addPerson(person.name, person.title, person.price)
+      await firebase.addPerson(person.name, person.title, person.image)
     } else if (personFormAction === "edit") {
       await firebase.editPerson(personToChange.id, person)
     }
-    const newPerons = await firebase.getPersons()
-    setPersons(newPerons)
+    const newPersons = await firebase.getPersons()
+    setPersons(newPersons)
+    setPersonModal(false)
+    setLoadingModal(false)
+  }
+
+  const onDeletePerson = async (person) => {
+    setLoadingModal(true)
+    await firebase.deletePerson(person.id)
+    const newPersons = await firebase.getPersons()
+    setPersons(newPersons)
     setPersonModal(false)
     setLoadingModal(false)
   }
@@ -120,19 +142,10 @@ function App() {
     }
   }, [persons])
 
-  const [imageUpload, setImageUpload] = useState(null)
-  const [imageList, setImageList] = useState([])
-  const imageListRef = ref(storage, "images/")
-
-  const uploadImage = () => {
-    if (imageUpload == null) return
-
-    const imageRef = ref(storage, `images/${imageUpload.name + v4()}`)
-    uploadBytes(imageRef, imageUpload).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((url) => {
-        setImageList((oldArray) => [...oldArray, url])
-      })
-    })
+  const uploadImage = async (image) => {
+    if (image == null) return
+    const imageRef = ref(storage, `images/${image.name + v4()}`)
+    return uploadBytes(imageRef, image).then(async (snapshot) => await getDownloadURL(snapshot.ref).then(url => url))
   }
 
   useEffect(() => {
@@ -153,14 +166,6 @@ function App() {
         console.error(e)
       }
     }
-
-    listAll(imageListRef).then((response) => {
-      response.items.forEach((item) => {
-        getDownloadURL(item).then((url) => {
-          setImageList((oldArray) => [...oldArray, url])
-        })
-      })
-    })
 
     fetchData()
   }, [])
@@ -186,40 +191,41 @@ function App() {
       >
         Добавить человека
       </Button>
-      <Table
-        persons={persons}
-        products={products}
-        usings={usings}
-        pricePerProducts={pricePerProducts}
-        onToggleCheckbox={onToggleCheckbox}
-        onEditProduct={(product) => {
-          openProductModal("edit", product)
-        }}
-        onEditPerson={(person) => {
-          openPersonModal("edit", person)
-        }}
-      />
-      <PieChart series={[{ data: chartData }]} width={400} height={200} />
+      <div className="content">
+        <Table
+          persons={persons}
+          products={products}
+          usings={usings}
+          pricePerProducts={pricePerProducts}
+          onToggleCheckbox={onToggleCheckbox}
+          onEditProduct={(product) => {
+            openProductModal("edit", product)
+          }}
+          onEditPerson={(person) => {
+            openPersonModal("edit", person)
+          }}
+        />
+        <PieChart series={[{ data: chartData }]} width={400} height={200} />
+      </div>
       <Modal open={loadingModal} allowClose={false}>
         <Loader />
       </Modal>
-      {}
       <Modal open={productModal} onClose={() => setProductModal(false)}>
         <ProductForm
-          onSubmit={onProductFormSubmit}
+          onSaveProduct={onSaveProduct}
+          onDeleteProduct={onDeleteProduct}
           action={productFormAction}
           product={productToChange}
         />
       </Modal>
       <Modal open={personModal} onClose={() => setPersonModal(false)}>
         <PersonForm
-          onSubmit={onPersonFormSubmit}
+          onSavePerson={onSavePerson}
+          onDeletePerson={onDeletePerson}
           action={personFormAction}
           person={personToChange}
         />
       </Modal>
-      <input onChange={(e) => setImageUpload(e.target.files[0])} type="file" />
-      <button onClick={uploadImage}>Upload image</button>
     </div>
   )
 }
