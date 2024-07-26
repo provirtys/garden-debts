@@ -1,22 +1,28 @@
 import { Table } from "./components/Table/Table"
 import "./scss/index.scss"
 import { useState, useEffect, useMemo } from "react"
-import firebase from "./firebase"
+import firebase, { storage } from "./firebase"
 import Modal from "./components/Modal/Modal"
 import Loader from "./components/loader"
 import { ProductForm } from "./components/ProductForm/ProductForm"
+import { PersonForm } from "./components/PersonForm/PersonForm"
 import Button from "@mui/material/Button"
 import * as React from "react"
 import { PieChart } from "@mui/x-charts/PieChart"
+import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage"
+import { v4 } from "uuid"
 
 function App() {
   const [loadingModal, setLoadingModal] = useState(false)
   const [productModal, setProductModal] = useState(false)
+  const [personModal, setPersonModal] = useState(false)
   const [persons, setPersons] = useState([])
   const [products, setProducts] = useState([])
   const [usings, setUsings] = useState([])
   const [productFormAction, setProductFormAction] = useState("")
+  const [personFormAction, setPersonFormAction] = useState("")
   const [productToChange, setProductToChange] = useState({})
+  const [personToChange, setPersonToChange] = useState({})
 
   const fetchUsings = async () => {
     await firebase.getUsings().then((usings) => setUsings(usings))
@@ -69,6 +75,12 @@ function App() {
     setProductModal(true)
   }
 
+  const openPersonModal = (action, person) => {
+    setPersonFormAction(action)
+    setPersonToChange(person)
+    setPersonModal(true)
+  }
+
   const onProductFormSubmit = async (product) => {
     setLoadingModal(true)
     if (productFormAction === "add") {
@@ -82,17 +94,46 @@ function App() {
     setLoadingModal(false)
   }
 
+  const onPersonFormSubmit = async (person) => {
+    setLoadingModal(true)
+    if (personFormAction === "add") {
+      console.log(person)
+      await firebase.addPerson(person.name, person.title, person.price)
+    } else if (personFormAction === "edit") {
+      await firebase.editPerson(personToChange.id, person)
+    }
+    const newPerons = await firebase.getPersons()
+    setPersons(newPerons)
+    setPersonModal(false)
+    setLoadingModal(false)
+  }
+
   const chartData = useMemo(() => {
     if (persons.length) {
       return persons?.map((person) => ({
         id: person.id,
-        label: person.name,
+        label: person.title,
         value: person.debt,
       }))
     } else {
       return []
     }
   }, [persons])
+
+  const [imageUpload, setImageUpload] = useState(null)
+  const [imageList, setImageList] = useState([])
+  const imageListRef = ref(storage, "images/")
+
+  const uploadImage = () => {
+    if (imageUpload == null) return
+
+    const imageRef = ref(storage, `images/${imageUpload.name + v4()}`)
+    uploadBytes(imageRef, imageUpload).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        setImageList((oldArray) => [...oldArray, url])
+      })
+    })
+  }
 
   useEffect(() => {
     setLoadingModal(true)
@@ -113,6 +154,14 @@ function App() {
       }
     }
 
+    listAll(imageListRef).then((response) => {
+      response.items.forEach((item) => {
+        getDownloadURL(item).then((url) => {
+          setImageList((oldArray) => [...oldArray, url])
+        })
+      })
+    })
+
     fetchData()
   }, [])
 
@@ -130,6 +179,13 @@ function App() {
       >
         Добавить продукт
       </Button>
+      <Button
+        className="add-person"
+        onClick={() => openPersonModal("add")}
+        variant="contained"
+      >
+        Добавить человека
+      </Button>
       <Table
         persons={persons}
         products={products}
@@ -139,8 +195,11 @@ function App() {
         onEditProduct={(product) => {
           openProductModal("edit", product)
         }}
+        onEditPerson={(person) => {
+          openPersonModal("edit", person)
+        }}
       />
-      <PieChart series={chartData} width={400} height={200} />
+      <PieChart series={[{ data: chartData }]} width={400} height={200} />
       <Modal open={loadingModal} allowClose={false}>
         <Loader />
       </Modal>
@@ -152,6 +211,15 @@ function App() {
           product={productToChange}
         />
       </Modal>
+      <Modal open={personModal} onClose={() => setPersonModal(false)}>
+        <PersonForm
+          onSubmit={onPersonFormSubmit}
+          action={personFormAction}
+          person={personToChange}
+        />
+      </Modal>
+      <input onChange={(e) => setImageUpload(e.target.files[0])} type="file" />
+      <button onClick={uploadImage}>Upload image</button>
     </div>
   )
 }

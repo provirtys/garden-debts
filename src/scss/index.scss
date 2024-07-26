@@ -1,6 +1,6 @@
 @import "./imports";
 
-*{
+* {
 	font-family: 'Roboto', sans-serif;
 	font-weight: 400;
 }
@@ -13,10 +13,12 @@
 
 .person-img {
 	margin-top: 5px;
-	width: 100%;
-	height: 100%;
+	// width: 100%;
+	// height: 100%;
 }
 
-button.add-product{
+button.add-product,
+button.add-person {
+	margin-right: 10px;
 	margin-bottom: 20px;
 }
