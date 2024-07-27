@@ -28,8 +28,43 @@
 	object-fit: cover;
 }
 
-button.add-product,
-button.add-person {
-	margin-right: 10px;
+.action-buttons {
 	margin-bottom: 20px;
+	display: flex;
+	gap: 0 10px;
+
+	&__button {
+		display: grid;
+		gap: 10px;
+		align-items: center;
+	}
+}
+
+.entity-form {
+	display: flex;
+	flex-direction: column;
+	background-color: var(--white);
+	border: 1px solid black;
+	border-radius: 5px;
+	padding: 10px 30px 30px;
+	min-width: 300px;
+	min-height: 200px;
+
+	&__title {
+		margin-bottom: 40px;
+	}
+
+	.entity-form__input {
+		margin-bottom: 10px;
+
+		&--file {
+			margin-bottom: 20px;
+		}
+	}
+}
+
+.form-buttons {
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
 }

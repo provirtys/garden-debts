@@ -58,24 +58,24 @@ export const PersonForm = ({ action, person, onSavePerson, onDeletePerson }) => 
           onChange={(e) => setForm({ ...form, title: e.target.value })}
         />
         <Input
-          className="entity-form__input"
+          className="entity-form__input entity-form__input--file"
           type="file"
           onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
         />
         {action === "add" && (
-          <Button className="form-button add-person" variant="contained" type="submit" onClick={addPersonHandler}>
+          <Button className="form-button" variant="contained" type="submit" onClick={addPersonHandler}>
             Добавить
           </Button>
         )}
         {action === "edit" &&
-          <>
-            <Button className="form-button add-person" variant="contained" type="submit" onClick={addPersonHandler}>
+          <div className="form-buttons">
+            <Button className="form-button" variant="contained" type="submit" onClick={addPersonHandler}>
               Сохранить
             </Button>
-            <Button className="form-button delete-person" color="error" variant="contained" type="submit" onClick={deletePersonHandler}>
+            <Button className="form-button" color="error" variant="contained" type="submit" onClick={deletePersonHandler}>
               Удалить
             </Button>
-          </>
+          </div>
         }
       </form>
     </>
