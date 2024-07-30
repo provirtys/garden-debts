@@ -116,9 +116,8 @@ class Firebase {
 
   async addPerson(name, title, image) {
     await this.db.collection("persons").add({
-      name,
       title,
-      image
+      image,
     })
   }
 

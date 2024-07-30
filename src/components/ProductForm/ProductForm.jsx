@@ -45,15 +45,14 @@ export const ProductForm = ({ action, product, onSaveProduct, onDeleteProduct })
     <>
       <form className='entity-form' onSubmit={e => e.preventDefault()}>
         <h2 className='entity-form__title'>{title}</h2>
-        <TextField className='entity-form__input' label="Код (например: apple)" variant="outlined" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         <TextField className='entity-form__input' label="Название" variant="outlined" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
         <TextField className='entity-form__input' label="Сумма (руб.)" type='number' variant="outlined" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
         {action === 'add' && <Button className="add-product" variant="contained" type='submit' onClick={onSaveProductHandler}>Добавить</Button>}
         {action === 'edit' &&
-          <>
+					<div className="form-buttons">
             <Button className="add-product" variant="contained" type='submit' onClick={onSaveProductHandler}>Сохранить</Button>
             <Button className="remove-product" variant="contained" type='submit' color='error' onClick={onDeleteProductHandler}>Удалить</Button>
-          </>
+          </div>
         }
       </form>
     </>
